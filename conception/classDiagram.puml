@@ -1,0 +1,98 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+abstract class User
+class Recipient
+class Provider
+class ErrandElement
+class CreditCard
+interface Service
+interface UserVisitor
+interface ServiceVisitor
+interface PaymentGate
+interface CreditCard
+interface PayPal
+interface Stripe
+
+'Inheritance
+Service <|-- User
+User <|-- Recipient
+User <|-- Provider
+
+class ErrandElement implements Element
+class ErrandDetailsVisitor implements UserVisitor
+class MeanVisitor implements UserVisitor
+class SmallTaxi implements Mean
+class BigTaxi implements Mean
+class SmallTruck implements Mean
+class BigTruck implements Mean
+class IndependantVehicle implements Mean
+
+interface Stripe implements PaymentGate
+interface CreditCard implements PaymentGate
+interface PayPal implements PaymentGate
+
+abstract class User {
+    Integer id
+    String fullname
+    String email
+    String passw
+    SERVICE service
+    MEAN mean
+    login()
+    logout()
+}
+
+abstract class Mean{
+    String type
+    String imgsPath
+}
+
+abstract class Service{
+    SERVICE service
+    Mean mean
+}
+
+class Recipient{
+}
+class Provider{
+}
+
+
+interface Element{
+    accept(Visitor visitor) : void
+}
+
+class ErrandElement{
+    User user
+    accept(Visitor visitor) : void
+}
+
+interface UserVisitor{
+    visit(User user) : void
+}
+interface ServiceVisitor{
+    visit(User user) : void
+}
+
+class ErrandDetailsVisitor{
+    visit(Recipient recipient) : void
+    visit(Provider provider) : void
+
+}
+
+class MeanVisitor{
+    visit(SmallTaxi provider) : void
+    visit(BigTaxi provider) : void
+    visit(SmallTruck provider) : void
+    visit(BigTruck provider) : void
+    visit(IndependantVehicle independantVehicle) : void
+}
+
+enum SERVICE {
+TRANSPORT
+RELOCATION
+CARPOOL
+}
+
+@enduml
