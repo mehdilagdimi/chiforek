@@ -6,31 +6,51 @@ class Recipient
 class Provider
 class ErrandElement
 class CreditCard
-interface Service
 interface UserVisitor
 interface ServiceVisitor
-interface PaymentGate
-interface CreditCard
-interface PayPal
-interface Stripe
+abstract class PaymentMethod
+class CreditCard
+class PayPal
+class Stripe
 
 'Inheritance
-Service <|-- User
+ProviderService <|-- Provider
 User <|-- Recipient
 User <|-- Provider
+ErrandService  <|-- TransportErrand
+ErrandService  <|-- RelocationErrand
+ErrandService  <|-- CarPoolErrand
+
+'association
+ErrandElement "0..*" - "1" Provider
+ErrandElement "0..*" - "1" Recipient
+ErrandElement "0..*" *-- "1" ErrandService
+
+'aggregation
+User "0..*" o-- "1" PaymentMethod
+ErrandElement "0..*" o-- "1" PaymentMethod
+
 
 class ErrandElement implements Element
-class ErrandDetailsVisitor implements UserVisitor
-class MeanVisitor implements UserVisitor
+class ErrandUserVisitor implements UserVisitor
+class ErrandServiceVisitor implements ServiceVisitor
 class SmallTaxi implements Mean
 class BigTaxi implements Mean
 class SmallTruck implements Mean
 class BigTruck implements Mean
 class IndependantVehicle implements Mean
 
-interface Stripe implements PaymentGate
-interface CreditCard implements PaymentGate
-interface PayPal implements PaymentGate
+Stripe --|> PaymentMethod
+CreditCard --|> PaymentMethod
+PayPal --|> PaymentMethod
+
+abstract class ErrandService{
+    Integer id
+    Mean mean
+    Timestamp acceptanceDate
+    Boolean rating
+    Text review
+}
 
 abstract class User {
     Integer id
@@ -44,11 +64,12 @@ abstract class User {
 }
 
 abstract class Mean{
-    String type
+    Integer id
+    SCOPE scope
     String imgsPath
 }
 
-abstract class Service{
+abstract class ProviderService{
     SERVICE service
     Mean mean
 }
@@ -64,35 +85,43 @@ interface Element{
 }
 
 class ErrandElement{
-    User user
-    accept(Visitor visitor) : void
+    SERVICE service
+    SCOPE scope
+'    ErrandService errandService
+'    PaymentMethod paymentMethod
+    Timestamp publishDate
+    accept(UserVisitor visitor) : void
+    accept(ErrandServiceVisitor errandServiceVisitor) : void
 }
 
 interface UserVisitor{
     visit(User user) : void
 }
 interface ServiceVisitor{
-    visit(User user) : void
+    visit(Errand errand) : void
 }
 
-class ErrandDetailsVisitor{
+class ErrandUserVisitor{
     visit(Recipient recipient) : void
     visit(Provider provider) : void
 
 }
 
-class MeanVisitor{
-    visit(SmallTaxi provider) : void
-    visit(BigTaxi provider) : void
-    visit(SmallTruck provider) : void
-    visit(BigTruck provider) : void
-    visit(IndependantVehicle independantVehicle) : void
+class ErrandServiceVisitor{
+    visit(TransportErrand transportErrand) : void
+    visit(RelocationErrand relocationErrand) : void
+    visit(CarPoolErrand carPoolErrand) : void
 }
 
 enum SERVICE {
 TRANSPORT
 RELOCATION
 CARPOOL
+}
+enum SCOPE {
+LOCAL
+NATIONAL
+NATIONAL&LOCAL
 }
 
 @enduml
