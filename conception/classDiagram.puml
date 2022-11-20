@@ -14,7 +14,6 @@ class PayPal
 class Stripe
 
 'Inheritance
-ProviderService <|-- Provider
 User <|-- Recipient
 User <|-- Provider
 ErrandService  <|-- TransportErrand
@@ -30,7 +29,7 @@ ErrandElement "0..*" *-- "1" ErrandService
 User "0..*" o-- "1" PaymentMethod
 ErrandElement "0..*" o-- "1" PaymentMethod
 
-
+'class Provider implements ProviderService
 class ErrandElement implements Element
 class ErrandUserVisitor implements UserVisitor
 class ErrandServiceVisitor implements ServiceVisitor
@@ -57,8 +56,6 @@ abstract class User {
     String fullname
     String email
     String passw
-    SERVICE service
-    MEAN mean
     login()
     logout()
 }
@@ -69,14 +66,16 @@ abstract class Mean{
     String imgsPath
 }
 
-abstract class ProviderService{
-    SERVICE service
-    Mean mean
-}
+'interface ProviderService{
+'    SERVICE service
+'    Mean mean
+'}
 
 class Recipient{
 }
 class Provider{
+ SERVICE service
+ Mean mean
 }
 
 
@@ -98,7 +97,7 @@ interface UserVisitor{
     visit(User user) : void
 }
 interface ServiceVisitor{
-    visit(Errand errand) : void
+    visit(ErrandService errandService) : void
 }
 
 class ErrandUserVisitor{
