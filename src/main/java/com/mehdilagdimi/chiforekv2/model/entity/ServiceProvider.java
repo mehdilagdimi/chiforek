@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,5 +26,9 @@ public class ServiceProvider extends User {
         super(parent.getEmail(), parent.getUsername(), parent.getTele(), parent.getRole(), parent.getPassword());
     }
 
+    public void addErrand(Errand errand){
+        if(errandList == null) errandList = new ArrayList<>();
+        errandList.add(errand);
+    }
 
 }

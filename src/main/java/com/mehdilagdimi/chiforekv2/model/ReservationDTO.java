@@ -11,13 +11,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ErrandDTO {
+public class ReservationDTO {
     private Long id;
-    private String _from;
-    private String _to;
+    private Long errandId;
+    private String from;
+    private String to;
+    private String recipientEmail;
+    private String providerEmail;
     private SERVICE service;
     private MEANTYPE meantype;
     private LocalDateTime createdAt;
-    private String description;
 }
 

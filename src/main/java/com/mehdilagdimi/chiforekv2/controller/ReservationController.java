@@ -3,8 +3,11 @@ package com.mehdilagdimi.chiforekv2.controller;
 import com.mehdilagdimi.chiforekv2.exception.ErrandNotFoundException;
 import com.mehdilagdimi.chiforekv2.model.ErrandDTO;
 import com.mehdilagdimi.chiforekv2.model.ErrandRequest;
+import com.mehdilagdimi.chiforekv2.model.ReservationDTO;
+import com.mehdilagdimi.chiforekv2.model.ReservationRequest;
 import com.mehdilagdimi.chiforekv2.model.entity.User;
 import com.mehdilagdimi.chiforekv2.service.ErrandService;
+import com.mehdilagdimi.chiforekv2.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -13,21 +16,22 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/v1/errands")
+@RequestMapping("/api/v1/reservations")
 @RequiredArgsConstructor
-public class ErrandController {
+public class ReservationController {
 
-    private final ErrandService errandService;
+    private final ReservationService reservationService;
 
     @PostMapping
     public ResponseEntity<?> save(
             Authentication authentication,
-           @RequestBody ErrandRequest errandRequest ) throws IllegalAccessException {
-        final ErrandDTO errandDTO =
-                errandService.save(
-                        errandRequest,
+           @RequestBody ReservationRequest reservationRequest ) throws IllegalAccessException {
+        final ReservationDTO reservationDTO =
+                reservationService.save(
+                        reservationRequest,
                         (User) authentication.getPrincipal() );
-        return ResponseEntity.status(201).body(errandDTO);
+
+        return ResponseEntity.status(201).body(reservationDTO);
     }
 
     @GetMapping
@@ -35,7 +39,7 @@ public class ErrandController {
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "itemsNum", defaultValue = "10") Integer numberOfItems
     ){
-        final Page<ErrandDTO> errandDTOList = errandService.getAll(page, numberOfItems);
+        final Page<ReservationDTO> errandDTOList = reservationService.getAll(page, numberOfItems);
 
         return ResponseEntity.ok().body( errandDTOList.getContent() );
     }
@@ -43,7 +47,7 @@ public class ErrandController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(
             @PathVariable Long id ){
-        final ErrandDTO errand = errandService.toDTO( errandService.getById(id) );
+        final ReservationDTO errand = reservationService.getById(id);
 
         return ResponseEntity.ok().body(errand);
     }
@@ -51,7 +55,7 @@ public class ErrandController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete (
             @PathVariable Long id) throws ErrandNotFoundException {
-        errandService.deleteById(id);
+        reservationService.deleteById(id);
 
         return ResponseEntity.ok().body(id);
 

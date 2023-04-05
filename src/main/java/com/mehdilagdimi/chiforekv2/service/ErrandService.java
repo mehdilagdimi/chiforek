@@ -1,11 +1,15 @@
 package com.mehdilagdimi.chiforekv2.service;
 
 
-import com.mehdilagdimi.chiforekv2.exception.UserNotFoundException;
+import com.mehdilagdimi.chiforekv2.exception.ErrandNotFoundException;
 import com.mehdilagdimi.chiforekv2.model.ErrandDTO;
 import com.mehdilagdimi.chiforekv2.model.ErrandRequest;
 import com.mehdilagdimi.chiforekv2.model.entity.Errand;
+import com.mehdilagdimi.chiforekv2.model.entity.Recipient;
+import com.mehdilagdimi.chiforekv2.model.entity.ServiceProvider;
+import com.mehdilagdimi.chiforekv2.model.entity.User;
 import com.mehdilagdimi.chiforekv2.repository.ErrandRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,9 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ErrandService {
 
+    private final EntityManager entityManager;
     private final ErrandRepository errandRepository;
 
-    public ErrandDTO save(ErrandRequest errandRequest){
+    public ErrandDTO save(ErrandRequest errandRequest, User serviceProvider) throws IllegalAccessException {
+        if(serviceProvider instanceof Recipient) throw new IllegalAccessException("User Not Allowed to Create Errand");
         Errand errand =
                 Errand.builder()
                     ._from(errandRequest._from())
@@ -31,38 +37,47 @@ public class ErrandService {
                     .service(errandRequest.service())
                     .build();
 
-        errandRepository.save(errand);
 
+        errand.setServiceProvider( (ServiceProvider) serviceProvider );
+        errandRepository.save(errand);
+        entityManager.flush();
         return toDTO(errand);
     }
 
 
-    public Page<ErrandDTO> getAllErrands(Integer page, Integer maxItems){
+    public Page<ErrandDTO> getAll(Integer page, Integer maxItems){
         Pageable pageable =
                 PageRequest
-                        .of(page, maxItems, Sort.by("created_at").descending());
+                        .of(page, maxItems, Sort.by("createdAt").descending());
 
         Page<Errand> errands = errandRepository.findAll(pageable);
 
         return toPageOfDTO(errands);
 
     }
-    public ErrandDTO getErrandById(Long id){
+    public Errand getById(Long id){
         Errand errand =
                 errandRepository.findById(id)
-                        .orElseThrow(() -> new UserNotFoundException("Invalid User ID"));
-
-        return toDTO(errand);
+                        .orElseThrow(() -> new ErrandNotFoundException("Invalid Errand ID"));
+        return errand;
 
     }
 
-    private ErrandDTO toDTO(Errand errand){
+    public synchronized void deleteById(Long id) throws ErrandNotFoundException {
+        if(!errandRepository.existsById(id)){
+            throw new ErrandNotFoundException("Invalid Errand ID");
+        }
+
+        errandRepository.deleteById(id);
+    }
+
+    public ErrandDTO toDTO(Errand errand){
         return
             ErrandDTO
                 .builder()
                     ._from(errand.get_from())
                     ._to(errand.get_to())
-                    .created_at(errand.getCreatedAt())
+                    .createdAt(errand.getCreatedAt())
                     .description(errand.getDescription())
                     .meantype(errand.getMeantype())
                     .service(errand.getService())

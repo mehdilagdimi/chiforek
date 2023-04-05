@@ -54,7 +54,7 @@ public class WebSecurityConfig {
                                                 "/*/cities"
                                                )
                                  .permitAll()
-                                .anyRequest().permitAll()
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

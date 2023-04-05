@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
         discriminatorType = DiscriminatorType.STRING)
 public class Errand {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Long id;
     private String _from;
     private String _to;
 
@@ -40,7 +40,7 @@ public class Errand {
     private String description;
 
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "provider_id", referencedColumnName = "id")
     private ServiceProvider serviceProvider;
 

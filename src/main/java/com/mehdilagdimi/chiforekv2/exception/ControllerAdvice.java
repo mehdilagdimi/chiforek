@@ -18,4 +18,10 @@ public class ControllerAdvice {
     public ResponseEntity<?> userNotFoundException( UserNotFoundException exception){
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
+
+    @ExceptionHandler(ErrandNotFoundException.class)
+    public ResponseEntity<?> errandNotFoundException( ErrandNotFoundException exception){
+        return ResponseEntity.badRequest().body(exception.getMessage());
+    }
+
 }
