@@ -37,7 +37,4 @@ public class Reservation {
     @JoinColumn(name = "recipient_id", referencedColumnName = "id")
     private Recipient recipient;
 
-
-
-
 }

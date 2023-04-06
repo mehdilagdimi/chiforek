@@ -51,7 +51,7 @@ public class WebSecurityConfig {
                         authorize -> authorize
                                 .requestMatchers(
                                         "/api/*/auth/**",
-                                                "/*/cities"
+                                                "/api/*/cities"
                                                )
                                  .permitAll()
                                 .anyRequest().authenticated()
@@ -82,7 +82,7 @@ public class WebSecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*", "http://localhost:4200"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

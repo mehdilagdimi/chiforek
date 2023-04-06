@@ -4,7 +4,6 @@ package com.mehdilagdimi.chiforekv2.model;
 import com.mehdilagdimi.chiforekv2.enums.UserRole;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
