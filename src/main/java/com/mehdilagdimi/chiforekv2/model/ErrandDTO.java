@@ -13,8 +13,9 @@ import java.time.LocalDateTime;
 @ToString
 public class ErrandDTO {
     private Long id;
-    private String _from;
-    private String _to;
+    private String from;
+    private String username;
+    private String to;
     private SERVICE service;
     private MEANTYPE meantype;
     private LocalDateTime createdAt;

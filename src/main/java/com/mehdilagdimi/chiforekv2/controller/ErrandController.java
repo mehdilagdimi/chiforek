@@ -39,6 +39,39 @@ public class ErrandController {
 
         return ResponseEntity.ok().body( errandDTOList.getContent() );
     }
+    @GetMapping("/providers")
+    public ResponseEntity<?> getAllByProvider(
+            Authentication authentication,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "itemsNum", defaultValue = "10") Integer numberOfItems
+    ){
+        final Page<ErrandDTO> errandDTOList =
+                errandService
+                        .getAllByProvider(
+                                null,
+                                page,
+                                numberOfItems,
+                                (User) authentication.getPrincipal());
+
+        return ResponseEntity.ok().body( errandDTOList.getContent() );
+    }
+    @GetMapping("/providers/{id}")
+    public ResponseEntity<?> getAllByProviderId(
+            Authentication authentication,
+            @PathVariable(name = "id", required = false) Long providerId,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "itemsNum", defaultValue = "10") Integer numberOfItems
+    ){
+        final Page<ErrandDTO> errandDTOList =
+                errandService
+                        .getAllByProvider(
+                                providerId,
+                                page,
+                                numberOfItems,
+                                (User) authentication.getPrincipal());
+
+        return ResponseEntity.ok().body( errandDTOList.getContent() );
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(

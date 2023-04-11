@@ -55,6 +55,22 @@ public class ErrandService {
         return toPageOfDTO(errands);
 
     }
+    public Page<ErrandDTO> getAllByProvider(Long providerId, Integer page, Integer maxItems, User serviceProvider){
+        Pageable pageable =
+                PageRequest
+                        .of(page, maxItems, Sort.by("createdAt").descending());
+
+        Page<Errand> errands =
+                errandRepository
+                        .findAllByServiceProviderId(
+                                providerId != null ? providerId : serviceProvider.getId(),
+                                pageable);
+
+        return toPageOfDTO(errands);
+
+    }
+
+
     public Errand getById(Long id){
         Errand errand =
                 errandRepository.findById(id)
@@ -75,8 +91,10 @@ public class ErrandService {
         return
             ErrandDTO
                 .builder()
-                    ._from(errand.get_from())
-                    ._to(errand.get_to())
+                    .id(errand.getId())
+                    .username(errand.getServiceProvider().getUsername())
+                    .from(errand.get_from())
+                    .to(errand.get_to())
                     .createdAt(errand.getCreatedAt())
                     .description(errand.getDescription())
                     .meantype(errand.getMeantype())

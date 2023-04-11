@@ -51,7 +51,8 @@ public class WebSecurityConfig {
                         authorize -> authorize
                                 .requestMatchers(
                                         "/api/*/auth/**",
-                                                "/api/*/cities"
+                                                "/api/*/cities",
+                                                "/api/*/errands"
                                                )
                                  .permitAll()
                                 .anyRequest().authenticated()

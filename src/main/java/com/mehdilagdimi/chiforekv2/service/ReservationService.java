@@ -7,6 +7,7 @@ import com.mehdilagdimi.chiforekv2.model.ErrandRequest;
 import com.mehdilagdimi.chiforekv2.model.ReservationDTO;
 import com.mehdilagdimi.chiforekv2.model.ReservationRequest;
 import com.mehdilagdimi.chiforekv2.model.entity.*;
+import com.mehdilagdimi.chiforekv2.repository.RecipientRepository;
 import com.mehdilagdimi.chiforekv2.repository.ReservationRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class ReservationService {
     private final EntityManager entityManager;
     private final ErrandService errandService;
     private final ReservationRepository reservationRepository;
+    private final RecipientRepository recipientRepository;
 
     public ReservationDTO save(ReservationRequest reservationRequest, User recipient) throws IllegalAccessException {
         if(recipient instanceof ServiceProvider) throw new IllegalAccessException("User Not Allowed to Create Reservation");
@@ -61,6 +64,25 @@ public class ReservationService {
         return toDTO(reservation);
 
     }
+
+    public Page<Reservation> getMyReservations(User principal, Integer maxItems, Integer requestedPage) {
+        Pageable pageableReservations = PageRequest.of(
+                requestedPage, maxItems
+        );
+        Recipient currentClient = recipientRepository.findById(principal.getId()).orElseThrow(() -> new UsernameNotFoundException("User not found......"));
+        Page<Reservation> reservationsPage = reservationRepository.findAllByRecipient(currentClient, pageableReservations);
+
+        // if(reservationsPage.isEmpty()) throw new EmptyResultDataAccessException("List of reservations records is empty", maxItems);
+
+        return reservationsPage;
+    }
+
+    public Long getMyReservationsCount(User principal) {
+        Recipient currentRecipient = recipientRepository.findById(principal.getId()).orElseThrow(() -> new UsernameNotFoundException("User not found......"));
+        Long reservationsCount = reservationRepository.countReservationByRecipient(currentRecipient);
+        return reservationsCount;
+    }
+
 
     public synchronized void deleteById(Long id) throws ErrandNotFoundException {
         if(!reservationRepository.existsById(id)){

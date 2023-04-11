@@ -1,13 +1,12 @@
 package com.mehdilagdimi.chiforekv2.controller;
 
 import com.mehdilagdimi.chiforekv2.exception.ErrandNotFoundException;
-import com.mehdilagdimi.chiforekv2.model.ErrandDTO;
-import com.mehdilagdimi.chiforekv2.model.ErrandRequest;
 import com.mehdilagdimi.chiforekv2.model.ReservationDTO;
 import com.mehdilagdimi.chiforekv2.model.ReservationRequest;
+import com.mehdilagdimi.chiforekv2.model.entity.Reservation;
 import com.mehdilagdimi.chiforekv2.model.entity.User;
-import com.mehdilagdimi.chiforekv2.service.ErrandService;
 import com.mehdilagdimi.chiforekv2.service.ReservationService;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +51,30 @@ public class ReservationController {
         return ResponseEntity.ok().body(errand);
     }
 
+    // Get All My Reservations
+    @RolesAllowed("RECIPIENT")
+    @GetMapping("/recipient")
+    public ResponseEntity<?> getMyReservations(
+            Authentication authentication,
+            @RequestParam(defaultValue = "34") Integer  maxItems,
+            @RequestParam(defaultValue = "0") Integer requestedPage
+    ){
+        Page<Reservation> reservations = reservationService.getMyReservations((User)authentication.getPrincipal(), maxItems, requestedPage);
+        Page<ReservationDTO> reservationsDto = this.mapToReservationDto(reservations);
+
+        return ResponseEntity.ok().body( reservationsDto.getContent() );
+    }
+
+    @RolesAllowed("RECIPIENT")
+    @GetMapping("/recipient/count")
+    public ResponseEntity<?> getMyReservationsCount(
+            Authentication authentication
+    ){
+        Long count = reservationService.getMyReservationsCount((User)authentication.getPrincipal());
+        return ResponseEntity.ok().body(count);
+    }
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete (
             @PathVariable Long id) throws ErrandNotFoundException {
@@ -63,5 +86,25 @@ public class ReservationController {
     @ExceptionHandler(IllegalAccessException.class)
     private ResponseEntity<?> userNotAllowedToSaveErrand(){
         return  ResponseEntity.status(401).build();
+    }
+
+
+    private Page<ReservationDTO> mapToReservationDto(Page<Reservation> reservationPage){
+        return
+                reservationPage
+                .map( reservation ->
+                        ReservationDTO
+                                .builder()
+                                .id(reservation.getId())
+                                .errandId(reservation.getId())
+                                .from(reservation.getErrand().get_from())
+                                .to(reservation.getErrand().get_to())
+                                .meantype(reservation.getErrand().getMeantype())
+                                .service(reservation.getErrand().getService())
+                                .recipientEmail(reservation.getRecipient().getEmail())
+                                .providerEmail(reservation.getErrand().getServiceProvider().getEmail())
+                                .createdAt(reservation.getCreatedAt())
+                                .build()
+                );
     }
 }

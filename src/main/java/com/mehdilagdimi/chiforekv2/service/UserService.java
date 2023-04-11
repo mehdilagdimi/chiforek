@@ -2,6 +2,7 @@ package com.mehdilagdimi.chiforekv2.service;
 
 
 import com.mehdilagdimi.chiforekv2.exception.UserAlreadyExistAuthenticationException;
+import com.mehdilagdimi.chiforekv2.exception.UserNotFoundException;
 import com.mehdilagdimi.chiforekv2.model.SignupRequest;
 import com.mehdilagdimi.chiforekv2.model.UserDTO;
 import com.mehdilagdimi.chiforekv2.model.entity.Admin;
@@ -68,7 +69,7 @@ public class UserService implements UserDetailsService{
     }
 
 
-    public Page<UserDTO> getAllUsers(int requestedPage, int maxItems){
+    public Page<UserDTO> getAll(int requestedPage, int maxItems){
         Pageable pageableUsers = PageRequest.of(
                 requestedPage, maxItems,
                 Sort.by("createdAt").descending().and(Sort.by("isEnabled").descending())
@@ -80,8 +81,10 @@ public class UserService implements UserDetailsService{
         return userDTOS;
     }
 
-    public User getUser(Long id){
-        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException());
+    public UserDTO getById(Long id){
+        return convertToUserResponse(
+                userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User Not found"))
+        );
     }
 
     public Recipient getRecipient(Long id){

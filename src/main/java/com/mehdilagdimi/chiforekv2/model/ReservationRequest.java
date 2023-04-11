@@ -5,9 +5,8 @@ import lombok.Builder;
 import java.util.Objects;
 
 @Builder
-public record ReservationRequest(Long errandId, Long recipientId) {
+public record ReservationRequest(Long errandId) {
     public ReservationRequest {
         Objects.requireNonNull(errandId);
-        Objects.requireNonNull(recipientId);
     }
 }
